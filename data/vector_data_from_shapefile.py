@@ -21,7 +21,7 @@ shapes = [shape(s) for s in shapes]
 # convert the shapes to machine learning vectors
 vectors = [gv.vectorize_wkt(s.wkt) for s in tqdm(shapes)]
 dummy_labels = [0 for p in vectors]
-train_data, test_data, _, _ = train_test_split(vectors, dummy_labels, test_size=0.15)
+train_data, test_data, _, _ = train_test_split(vectors, dummy_labels, test_size=0.15, random_state=42)
 
 print('Saving training data...')
 np.savez_compressed(file=TRAIN_SET_FILE_NAME, data=train_data)
