@@ -8,6 +8,9 @@ verify_ssl = true
 [packages]
 pyshp = "*"
 shapely = "*"
+deep-geometry = "*"
+tqdm = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.7"
