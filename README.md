@@ -11,4 +11,4 @@
 - [x] Get the neighborhoods data
 - [x] Create a vector representation of neighborhoods to use in a machine learning model
 - [x] Create a train/test split for the neighborhoods
-- [ ] Persist the training and test data
+- [x] Persist the training and test data
