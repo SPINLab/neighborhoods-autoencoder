@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def elliptic_fourier_descriptors(contour, order=2, normalize=False):
+def elliptic_fourier_descriptors(contour, order=10, normalize=False):
     """Calculate elliptical Fourier descriptors for a contour.
     :param numpy.ndarray contour: A contour array of size ``[M x 2]``.
     :param int order: The order of Fourier coefficients to calculate.
@@ -21,21 +21,23 @@ def elliptic_fourier_descriptors(contour, order=2, normalize=False):
     T = t[-1]
 
     phi = (2 * np.pi * t) / T
-    coeffs = np.zeros((order, 4))
 
-    order = 1
-    for n in range(1, order + 1):
-        const = T / (2 * n * n * np.pi * np.pi)
-        phi_n = phi * n
-        print('phi_n:', phi_n)
-        d_cos_phi_n = np.cos(phi_n[1:]) - np.cos(phi_n[:-1])
-        d_sin_phi_n = np.sin(phi_n[1:]) - np.sin(phi_n[:-1])
-        a_n = const * np.sum((dxy[:, 0] / dt) * d_cos_phi_n)
-        b_n = const * np.sum((dxy[:, 0] / dt) * d_sin_phi_n)
-        c_n = const * np.sum((dxy[:, 1] / dt) * d_cos_phi_n)
-        d_n = const * np.sum((dxy[:, 1] / dt) * d_sin_phi_n)
+    orders = np.arange(1, order + 1)
+    consts = T / (2 * orders * orders * np.pi * np.pi)
+    phi = phi * orders.reshape((order, -1))
+    d_cos_phi = np.cos(phi[:, 1:]) - np.cos(phi[:, :-1])
+    d_sin_phi = np.sin(phi[:, 1:]) - np.sin(phi[:, :-1])
+    cos_phi = (dxy[:, 0] / dt) * d_cos_phi
+    a = consts * np.sum(cos_phi, axis=1)
+    b = consts * np.sum((dxy[:, 0] / dt) * d_sin_phi, axis=1)
+    c = consts * np.sum((dxy[:, 1] / dt) * d_cos_phi, axis=1)
+    d = consts * np.sum((dxy[:, 1] / dt) * d_sin_phi, axis=1)
 
-    coeffs[n - 1, :] = a_n, b_n, c_n, d_n
-    # print('pyefd coeffs:', coeffs)
+    coeffs = np.concatenate([
+        a.reshape((order, 1)),
+        b.reshape((order, 1)),
+        c.reshape((order, 1)),
+        d.reshape((order, 1))
+        ], axis=1)
 
     return coeffs
