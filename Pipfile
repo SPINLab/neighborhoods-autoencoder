@@ -12,6 +12,8 @@ deep-geometry = "*"
 tqdm = "*"
 sklearn = "*"
 numpy = "*"
+torch = "==1.0.1.post2"
+pyefd = "*"
 
 [requires]
 python_version = "3.7"
