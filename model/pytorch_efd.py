@@ -11,6 +11,7 @@ def efd(polygon: torch.Tensor, order=10) -> torch.Tensor:
     :return:
     """
     assert isinstance(polygon, torch.Tensor), 'The polygon should be a tensor'
+    # assert len(polygon.size()) == 3, 'The batch of polygons should be a 3D tensor'
     assert polygon.size(1) == 2, 'The polygon should be of shape (?, 2): two coordinate axes'
 
     # Add zero-padding in case the polygon doesn't have this

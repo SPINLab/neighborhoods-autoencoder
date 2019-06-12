@@ -20,8 +20,10 @@ class TestEllipticFourierDescriptor(unittest.TestCase):
         polygon_tensor = geom1[:, :2]
         polygon_tensor = torch.from_numpy(polygon_tensor)
 
-        reference_descriptors = pyefd.elliptic_fourier_descriptors(geom2[:, :2], order=10)
-        stand_in_descriptors = elliptic_fourier_descriptors(geom2[:, :2], order=10)
+        coords_batch = geom2[:, :2]
+        coords_batch = coords_batch.reshape(1, geom2.shape[0], 2)
+        reference_descriptors = pyefd.elliptic_fourier_descriptors(coords_batch[0], order=10)
+        stand_in_descriptors = elliptic_fourier_descriptors(coords_batch[0], order=10)
 
         with self.subTest('Our stand-in efd function does the same as pyefd'):
             np.testing.assert_array_equal(reference_descriptors, stand_in_descriptors)
@@ -39,7 +41,7 @@ class TestEllipticFourierDescriptor(unittest.TestCase):
             # polygon1_tensor = torch.from_numpy(polygon1_tensor)
             # polygon1_efd = efd(polygon1_tensor, order=10).numpy()
 
-            polygon2_tensor = geom2[:, :2]
+            polygon2_tensor = coords_batch[0]
             polygon2_tensor = torch.from_numpy(polygon2_tensor)
             polygon2_efd = efd(polygon2_tensor, order=10).numpy()
 
@@ -56,7 +58,7 @@ class TestEllipticFourierDescriptor(unittest.TestCase):
         with self.subTest('It creates equal coefficients for zero-padded coordinate sequences'):
             torch.manual_seed(42)
             random_coordinates = torch.rand((4, 2), dtype=torch.double)
-            zero_padded_random_coords = torch.cat((random_coordinates, torch.zeros((4, 2), dtype=torch.double)))
+            zero_padded_random_coords = torch.cat((random_coordinates, torch.zeros((1000, 2), dtype=torch.double)))
 
             non_zero_coeffs = efd(random_coordinates).numpy()
             padded_coeffs = efd(zero_padded_random_coords).numpy()
