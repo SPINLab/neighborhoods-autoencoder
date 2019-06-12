@@ -33,14 +33,14 @@ def efd(polygon: torch.Tensor, order=10) -> torch.Tensor:
     # Replace the false maximum introduced by the zero padding with a true max
     false_max = torch.max(cumulative_lengths)
     rescale_factor = cumulative_lengths / (cumulative_lengths - false_max + epsilon)
-    reduced_cumsums = cumulative_lengths - false_max
-    rescaled_cumsums = reduced_cumsums * rescale_factor
+    cumulative_lengths = cumulative_lengths - false_max
+    cumulative_lengths = cumulative_lengths * rescale_factor
 
     # Replace the zeros with true max
-    true_max = torch.max(rescaled_cumsums)
-    rescale_factor = rescaled_cumsums / (rescaled_cumsums - true_max + epsilon)
-    rescaled_cumsums = rescaled_cumsums * rescale_factor  # TODO: this is / (rescale_factor + epsilon) or something
-    rescaled_cumsums = rescaled_cumsums + true_max
+    true_max = torch.max(cumulative_lengths)
+    rescale_factor = (cumulative_lengths - true_max) / (cumulative_lengths +  epsilon)
+    cumulative_lengths = cumulative_lengths * rescale_factor
+    cumulative_lengths = cumulative_lengths + true_max
 
     zeros = torch.zeros((1,), dtype=torch.double)
     cumulative_lengths = torch.cat((zeros, cumulative_lengths))  # pyefd: t
