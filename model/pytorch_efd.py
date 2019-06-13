@@ -42,19 +42,17 @@ def efd(polygon_batch: torch.Tensor, order=10) -> torch.Tensor:
 
     # Replace the zeros with true max
     true_max = torch.max(cumulative_lengths, dim=1)
-    true_max = true_max[0]
+    true_max = true_max[0]  # pyefd: T
     rescale_factor = (cumulative_lengths - true_max) / (cumulative_lengths +  epsilon)
     cumulative_lengths = cumulative_lengths * rescale_factor
     cumulative_lengths = cumulative_lengths + true_max
 
     zeros = torch.zeros((batch_size, 1), dtype=torch.double)
     cumulative_lengths = torch.cat((zeros, cumulative_lengths), dim=1)  # pyefd: t
-    total_distance = cumulative_lengths[:, -1]  # pyefd: T TODO: replace by true_max
-
-    normalized_distances = (2 * math.pi * cumulative_lengths) / total_distance  # pyefd: phi
+    normalized_distances = (2 * math.pi * cumulative_lengths) / true_max  # pyefd: phi
 
     efd_orders = torch.arange(1, order + 1, dtype=torch.double).view(batch_size, -1)  # pyefd: n in orders
-    consts = total_distance / (2 * efd_orders ** 2 * math.pi ** 2)
+    consts = true_max / (2 * efd_orders ** 2 * math.pi ** 2)
     normalized_distances = efd_orders.t() * normalized_distances   # pyefd: phi_n
     d_cos_phi = torch.cos(normalized_distances[:, 1:]) - torch.cos(normalized_distances[:, :-1])
     d_sin_phi = torch.sin(normalized_distances[:, 1:]) - torch.sin(normalized_distances[:, :-1])
