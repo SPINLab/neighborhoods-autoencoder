@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def elliptic_fourier_descriptors(contour, order=10, normalize=False):
+def numpy_vectorized_efd(contour, order=10, normalize=False):
     """Calculate elliptical Fourier descriptors for a contour.
     :param numpy.ndarray contour: A contour array of size ``[M x 2]``.
     :param int order: The order of Fourier coefficients to calculate.
