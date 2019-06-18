@@ -68,3 +68,12 @@ class TestEllipticFourierDescriptor(unittest.TestCase):
             padded_coeffs = efd(zero_padded_random_coords).numpy()
 
             np.testing.assert_array_almost_equal(non_zero_coeffs, padded_coeffs)
+
+        with self.subTest('It creates descriptors for a batch of size 2 same as the pyefd implementation'):
+            size_two_batch = torch.cat((polygon2_tensor, polygon2_tensor * 2), dim=0)
+            resized_descriptors = pyefd.elliptic_fourier_descriptors(polygon2_tensor[0] * 2, order=10)
+            size_two_descriptors = efd(size_two_batch)
+
+            size_two_descriptors = size_two_descriptors.numpy()
+            np.testing.assert_array_almost_equal(pyefd_descriptors, size_two_descriptors[0])
+            np.testing.assert_array_almost_equal(resized_descriptors, size_two_descriptors[1])
