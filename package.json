@@ -1,0 +1,36 @@
+{
+  "name": "neighborhoods-autoencoder",
+  "version": "0.1.0",
+  "description": "Web front end demo of shape analysis using elliptical fourier descriptors",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SPINLab/neighborhoods-autoencoder.git"
+  },
+  "author": "Rein van t Veer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SPINLab/neighborhoods-autoencoder/issues"
+  },
+  "homepage": "https://github.com/SPINLab/neighborhoods-autoencoder#readme",
+  "dependencies": {
+    "@tensorflow/tfjs": "^1.2.1",
+    "leaflet": "^1.5.1",
+    "leaflet-draw": "^1.0.4"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-almost": "^1.0.1",
+    "chai-as-promised": "^7.1.1",
+    "css-loader": "^3.0.0",
+    "file-loader": "^4.0.0",
+    "mocha": "^6.1.4",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.35.0",
+    "webpack-cli": "^3.3.5"
+  }
+}

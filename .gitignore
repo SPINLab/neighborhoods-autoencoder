@@ -104,3 +104,9 @@ venv.bak/
 .mypy_cache/
 /.idea/
 /data/Uitvoer_shape/
+
+# node modules
+/node_modules/
+
+# unignore javascript dist
+!js/dist
