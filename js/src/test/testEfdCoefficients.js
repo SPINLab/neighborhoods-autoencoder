@@ -34,7 +34,7 @@ describe('The tensorflow.js elliptic fourier descriptor library', () => {
   describe('The efd offset function', () => {
     it('should calculate the verified offsets', () => {
       const expectedOffsets = [0.5, 0.5];
-      return expect(efdOffsets(polygon)).to.eventually.be.deep.almost([0])
+      return expect(efdOffsets(polygon)).to.eventually.be.deep.equal(expectedOffsets)
     })
   })
 });

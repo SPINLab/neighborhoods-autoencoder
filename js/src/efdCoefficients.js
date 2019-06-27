@@ -128,7 +128,10 @@ function efdOffsets(polygon) {
   // # A0 and CO relate to the first point of the contour array as origin.
   //   # Adding those values to the coefficients to make them relate to true origin.
   //   return contour[0, 0] + A0, contour[0, 1] + C0
-  const offsets = tf.concat([polygon.slice([0, 0]).add(A0), polygon.slice([0, 1]).add(C0)]);
+  const offsets = tf.concat([
+    polygon.slice([0, 0], [1, 1]).add(A0),
+    polygon.slice([0, 1], [1, 1]).add(C0)],
+    ).squeeze();
   return offsets.array();
 }
 
