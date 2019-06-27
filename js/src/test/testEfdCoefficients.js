@@ -3,14 +3,13 @@ const expect = require('chai').expect;
 const chaiAsPromised = require('chai-as-promised');
 const chaiAlmost = require('chai-almost');
 
-const tf = require('@tensorflow/tfjs');
-
-const efd = require('../efdCoefficients');
+const efd = require('../efdCoefficients').efd;
+const efdOffsets = require('../efdCoefficients').efdOffsets;
 
 chai.use(chaiAsPromised).should();
 chai.use(chaiAlmost(customTolerance=1e-7));
 
-const polygon = tf.tensor([[1., 1.], [0., 1.], [0., 0.], [1., 0.], [1., 1.]]);
+const polygon = [[1., 1.], [0., 1.], [0., 0.], [1., 0.], [1., 1.]];
 
 const expectedCoefficients =
   [[ 4.05284735e-01, -4.05284735e-01,  4.05284735e-01,  4.05284735e-01],
@@ -25,9 +24,18 @@ const expectedCoefficients =
    [ 0.00000000e+00,  1.21626096e-17,  0.00000000e+00, -1.21626096e-17]];
 
 describe('The tensorflow.js elliptic fourier descriptor library', () => {
-  describe('The efd function', () => {
+
+  describe('The efd coefficient function', () => {
     it('should create the pre-defined coefficients for a simple square', () => {
       return expect(efd(polygon)).to.eventually.be.deep.almost(expectedCoefficients)
     })
+  });
+
+  describe('The efd offset function', () => {
+    it('should calculate the verified offsets', () => {
+      const expectedOffsets = [0.5, 0.5];
+      return expect(efdOffsets(polygon)).to.eventually.be.deep.almost([0])
+    })
   })
 });
+
