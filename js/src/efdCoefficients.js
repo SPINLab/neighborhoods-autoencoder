@@ -1,6 +1,6 @@
 const tf = require('@tensorflow/tfjs');
 
-function efd(polygon, order=10) {
+export function efd(polygon, order=10) {
   polygon = tf.tensor(polygon);
 
   const nextPoints = polygon.slice([0], [polygon.shape[0] - 1]);
@@ -9,12 +9,12 @@ function efd(polygon, order=10) {
   const epsilon = tf.scalar(1e-16);
 
   let lengths = pointDistances.square();
-  lengths = lengths.sum(axis=1)
+  lengths = lengths.sum(1)
     .add(epsilon)
     .sqrt()
     .sub(epsilon);
 
-  let cumulativeLengths = lengths.cumsum(axis=0);
+  let cumulativeLengths = lengths.cumsum(0);
   const zeros = tf.zeros([1]);
   cumulativeLengths = tf.concat([zeros, cumulativeLengths]);
   const total_distance = tf.max(cumulativeLengths);
@@ -38,23 +38,23 @@ function efd(polygon, order=10) {
     .mul(d_cos_phi)
     .div(lengths);
 
-  const aCoeffs = constants.mul(cos_phi.sum(axis=1));
+  const aCoeffs = constants.mul(cos_phi.sum(1));
 
   const bCoeffs = constants.mul(
     xDistances.div(lengths)
       .mul(d_sin_phi)
-      .sum(axis=1)
+      .sum(1)
   );
 
   const cCoeffs = constants.mul(
     yDistances.div(lengths)
       .mul(d_cos_phi)
-      .sum(axis=1)
+      .sum(1)
   );
 
   const dCoeffs = constants.mul(yDistances.div(lengths)
     .mul(d_sin_phi)
-    .sum(axis=1));
+    .sum(1));
 
   const coeffs = tf.stack([
     aCoeffs,
@@ -67,7 +67,7 @@ function efd(polygon, order=10) {
   return coeffs.array()
 }
 
-function efdOffsets(polygon) {
+export function efdOffsets(polygon) {
   polygon = tf.tensor(polygon);
 
   const nextPoints = polygon.slice([0], [polygon.shape[0] - 1]);
@@ -76,12 +76,12 @@ function efdOffsets(polygon) {
   const epsilon = tf.scalar(1e-16);
 
   let lengths = pointDistances.square();
-  lengths = lengths.sum(axis=1)
+  lengths = lengths.sum(1)
     .add(epsilon)
     .sqrt()
     .sub(epsilon);
 
-  let cumulativeLengths = lengths.cumsum(axis=0);
+  let cumulativeLengths = lengths.cumsum(0);
   const zeros = tf.zeros([1]);
   cumulativeLengths = tf.concat([zeros, cumulativeLengths]);
   const total_distance = tf.max(cumulativeLengths);
@@ -135,7 +135,7 @@ function efdOffsets(polygon) {
   return offsets.array();
 }
 
-function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=200) {
+export function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=200) {
   let coeffsTensor = tf.tensor(coefficients);
   // coeffsTensor = coeffsTensor.reshape([coeffsTensor.shape[0], coeffsTensor.shape[1], 1]);
   const locusTensor = tf.tensor(locus);
@@ -153,7 +153,7 @@ function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=200) {
     .add(
       coeffsTensor.slice([0, 1], [coeffsTensor.shape[0], 1])
         .mul(tf.sin(orderPhases))
-    ).sum(axis=0)
+    ).sum(0)
     .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([0], [1])));
 
   const ytAll = coeffsTensor.slice([0, 2], [coeffsTensor.shape[0], 1])
@@ -161,15 +161,13 @@ function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=200) {
     .add(
       coeffsTensor.slice([0, 3], [coeffsTensor.shape[0], 1])
         .mul(tf.sin(orderPhases))
-    ).sum(axis=0)
+    ).sum(0)
     .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([1], [1])));
 
   const reconstruction = tf.stack([
     xtAll,
     ytAll
-  ], axis=1);
+  ], 1);
 
   return reconstruction.array();
 }
-
-module.exports = {efd, efdOffsets, reconstructPolygon};

@@ -1,14 +1,16 @@
-const chai = require('chai');
-const expect = require('chai').expect;
-const chaiAsPromised = require('chai-as-promised');
-const chaiAlmost = require('chai-almost');
+import chai from 'chai';
+import expect from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import chaiAlmost from 'chai-almost';
+// const chaiAsPromised = require('chai-as-promised');
+// const chaiAlmost = require('chai-almost');
 
-const efd = require('../efdCoefficients').efd;
-const efdOffsets = require('../efdCoefficients').efdOffsets;
-const reconstructPolygon = require('../efdCoefficients').reconstructPolygon;
+import {efd, efdOffsets, reconstructPolygon} from '../efdCoefficients';
+// const efdOffsets = require('../efdCoefficients').efdOffsets;
+// const reconstructPolygon = require('../efdCoefficients').reconstructPolygon;
 
 chai.use(chaiAsPromised).should();
-chai.use(chaiAlmost(customTolerance=1e-7));
+chai.use(chaiAlmost(1e-7));
 
 const polygon = [[1., 1.], [0., 1.], [0., 0.], [1., 0.], [1., 1.]];
 
@@ -28,23 +30,23 @@ describe('The tensorflow.js elliptic fourier descriptor library', () => {
 
   describe('The efd coefficient function', () => {
     it('should create the pre-defined coefficients for a simple square', () => {
-      return expect(efd(polygon)).to.eventually.be.deep.almost(expectedCoefficients)
+      return efd(polygon).should.eventually.be.deep.almost(expectedCoefficients)
     })
   });
 
   describe('The efd offset function', () => {
     it('should calculate the verified offsets', () => {
       const expectedOffsets = [0.5, 0.5];
-      return expect(efdOffsets(polygon)).to.eventually.be.deep.equal(expectedOffsets)
+      return efdOffsets(polygon).should.eventually.be.deep.equal(expectedOffsets)
     })
   });
 
   describe('The polygon reconstruction function', () => {
     it('should reconstruct the original polygon', function () {
       // const coefficients = efd(polygon;
-      chai.use(chaiAlmost(customTolerance=5e-2));
-      return expect(reconstructPolygon(expectedCoefficients, locus=[0.5, 0.5], numberOfPoints=5))
-        .to.eventually.be.deep.almost(polygon);
+      chai.use(chaiAlmost(5e-2));
+      return reconstructPolygon(expectedCoefficients, [0.5, 0.5], 5)
+        .should.eventually.be.deep.almost(polygon);
     });
   })
 });

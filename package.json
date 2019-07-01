@@ -19,10 +19,17 @@
   "homepage": "https://github.com/SPINLab/neighborhoods-autoencoder#readme",
   "dependencies": {
     "@tensorflow/tfjs": "^1.2.1",
+    "jquery": "^3.4.1",
+    "jquery-knob": "^1.2.11",
     "leaflet": "^1.5.1",
     "leaflet-draw": "^1.0.4"
   },
   "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
     "chai": "^4.2.0",
     "chai-almost": "^1.0.1",
     "chai-as-promised": "^7.1.1",

@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   entry: './js/src/polygonMap.js',
   output: {
-    filename: 'polygonMap.js',
+    filename: 'main.js',
     path: path.resolve(__dirname, 'js/dist')
   },
   module: {
