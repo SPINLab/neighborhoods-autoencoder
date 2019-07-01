@@ -5,6 +5,7 @@ const chaiAlmost = require('chai-almost');
 
 const efd = require('../efdCoefficients').efd;
 const efdOffsets = require('../efdCoefficients').efdOffsets;
+const reconstructPolygon = require('../efdCoefficients').reconstructPolygon;
 
 chai.use(chaiAsPromised).should();
 chai.use(chaiAlmost(customTolerance=1e-7));
@@ -36,6 +37,14 @@ describe('The tensorflow.js elliptic fourier descriptor library', () => {
       const expectedOffsets = [0.5, 0.5];
       return expect(efdOffsets(polygon)).to.eventually.be.deep.equal(expectedOffsets)
     })
+  });
+
+  describe('The polygon reconstruction function', () => {
+    it('should reconstruct the original polygon', function () {
+      // const coefficients = efd(polygon;
+      chai.use(chaiAlmost(customTolerance=5e-2));
+      return expect(reconstructPolygon(expectedCoefficients, locus=[0.5, 0.5], numberOfPoints=5))
+        .to.eventually.be.deep.almost(polygon);
+    });
   })
 });
-

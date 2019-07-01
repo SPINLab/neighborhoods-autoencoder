@@ -135,4 +135,41 @@ function efdOffsets(polygon) {
   return offsets.array();
 }
 
-module.exports = {efd, efdOffsets};
+function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=200) {
+  let coeffsTensor = tf.tensor(coefficients);
+  // coeffsTensor = coeffsTensor.reshape([coeffsTensor.shape[0], coeffsTensor.shape[1], 1]);
+  const locusTensor = tf.tensor(locus);
+
+  const order = coeffsTensor.shape[0];
+  const orders = tf.range(1, order + 1).reshape([-1, 1]);
+
+  const t = tf.linspace(0, 1.0, numberOfPoints);
+  const orderPhases = orders.mul(tf.scalar(2))
+    .mul(tf.scalar(Math.PI))
+    .mul(t.reshape([1, -1]));
+
+  const xtAll = coeffsTensor.slice([0, 0], [coeffsTensor.shape[0], 1])
+    .mul(tf.cos(orderPhases))
+    .add(
+      coeffsTensor.slice([0, 1], [coeffsTensor.shape[0], 1])
+        .mul(tf.sin(orderPhases))
+    ).sum(axis=0)
+    .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([0], [1])));
+
+  const ytAll = coeffsTensor.slice([0, 2], [coeffsTensor.shape[0], 1])
+    .mul(tf.cos(orderPhases))
+    .add(
+      coeffsTensor.slice([0, 3], [coeffsTensor.shape[0], 1])
+        .mul(tf.sin(orderPhases))
+    ).sum(axis=0)
+    .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([1], [1])));
+
+  const reconstruction = tf.stack([
+    xtAll,
+    ytAll
+  ], axis=1);
+
+  return reconstruction.array();
+}
+
+module.exports = {efd, efdOffsets, reconstructPolygon};
