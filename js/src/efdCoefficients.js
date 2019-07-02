@@ -1,6 +1,7 @@
 const tf = require('@tensorflow/tfjs');
 
 export function efd(polygon, order=10) {
+  if (typeof order !== "number") return Promise.reject(new Error('Please provide an integer as order argument.'));
   polygon = tf.tensor(polygon);
 
   const nextPoints = polygon.slice([0], [polygon.shape[0] - 1]);

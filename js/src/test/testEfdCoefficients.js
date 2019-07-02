@@ -1,5 +1,4 @@
 import chai from 'chai';
-import expect from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import chaiAlmost from 'chai-almost';
 // const chaiAsPromised = require('chai-as-promised');
@@ -27,18 +26,23 @@ const expectedCoefficients =
    [ 0.00000000e+00,  1.21626096e-17,  0.00000000e+00, -1.21626096e-17]];
 
 describe('The tensorflow.js elliptic fourier descriptor library', () => {
-
   describe('The efd coefficient function', () => {
     it('should create the pre-defined coefficients for a simple square', () => {
       return efd(polygon).should.eventually.be.deep.almost(expectedCoefficients)
+    });
+
+    it('rejects non-integer orders', () => {
+      return efd(polygon, 'I am not a number')
+        .should.be.rejectedWith('Please provide an integer as order argument.');
     })
+
   });
 
   describe('The efd offset function', () => {
     it('should calculate the verified offsets', () => {
       const expectedOffsets = [0.5, 0.5];
       return efdOffsets(polygon).should.eventually.be.deep.equal(expectedOffsets)
-    })
+    });
   });
 
   describe('The polygon reconstruction function', () => {
