@@ -1,0 +1,25 @@
+#dials {
+    height: 320px;
+    overflow: hidden;
+}
+
+.dial {
+    display: block;
+    position: relative;
+    height: 320px;
+}
+
+.dial.hidden {
+    display: none;
+}
+
+#jog_dial {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 20px auto;
+    background: url('img/base_one_bg.png') no-repeat;
+}
+#jog_dial #jog_dial_knob {
+    background: url('img/base_one_knob.png') no-repeat;
+}
