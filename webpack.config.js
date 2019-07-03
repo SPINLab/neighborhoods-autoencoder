@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './js/src/polygonMap.js',
+  entry: './js/src/main.js',
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'js/dist')
