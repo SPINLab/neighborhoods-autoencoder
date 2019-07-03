@@ -10,7 +10,7 @@ import './img/base_one_knob.png';
 * Licensed under the MIT license 
 */
 
-var JogDial = function (element, options) {
+const JogDial = function (element, options) {
   return new JogDial.Instance(element, options || {});
 };
 
@@ -28,10 +28,10 @@ function setConstants() {
   JogDial.ToDeg   = 180 / Math.PI;
 
   // Detect mouse event type
-  JogDial.ModernEvent   = (JogDial.Doc.addEventListener) ? true : false;
+  JogDial.ModernEvent   = !!(JogDial.Doc.addEventListener);
   JogDial.MobileRegEx   = '/Mobile|iP(hone|od|ad)|Android|BlackBerry|IEMobile|Kindle|NetFront|Silk-Accelerated|(hpw|web)OS|Fennec|Minimo|Opera M(obi|ini)|Blazer|Dolfin|Dolphin|Skyfire|Zune/';
   JogDial.MobileEvent   = ('ontouchstart' in window) && window.navigator.userAgent.match(JogDial.MobileRegEx);
-  JogDial.PointerEvent  = (window.navigator.pointerEnabled || window.navigator.msPointerEnabled) ? true : false;
+  JogDial.PointerEvent  = (window.navigator.pointerEnabled || window.navigator.msPointerEnabled);
 
   // Predefined options
   JogDial.Defaults = {
@@ -69,7 +69,7 @@ function setConstants() {
   // Utilities
   JogDial.utils  = {
     extend : function (target, src) {
-      for (var key in src) {
+      for (const key in src) {
         target[key] = src[key];
       }
       return target;
@@ -88,10 +88,10 @@ function setConstants() {
     //Calculating x and y coordinates
     getCoordinates: function (e) {
       e = e || window.event;
-      var target = e.target || e.srcElement,
-        rect   = target.getBoundingClientRect(),
-        _x   = ((JogDial.MobileEvent) ? e.targetTouches[0].clientX : e.clientX) - rect.left,
-        _y   = ((JogDial.MobileEvent) ? e.targetTouches[0].clientY : e.clientY) - rect.top;
+      const target = e.target || e.srcElement,
+        rect = target.getBoundingClientRect(),
+        _x = ((JogDial.MobileEvent) ? e.targetTouches[0].clientX : e.clientX) - rect.left,
+        _y = ((JogDial.MobileEvent) ? e.targetTouches[0].clientY : e.clientY) - rect.top;
       return {x:_x,y:_y};
     },
 
@@ -106,11 +106,11 @@ function setConstants() {
 
     // Returne the sum of rotation value
     getRotation: function(self, quadrant, newDegree){
-      var rotation, delta = 0, info = self.info;
-        if(quadrant == 1 && info.old.quadrant == 2){ //From 360 to 0
+      let rotation, delta = 0, info = self.info;
+      if(quadrant === 1 && info.old.quadrant === 2){ //From 360 to 0
           delta = 360;
         }
-        else if(quadrant == 2 && info.old.quadrant == 1){ //From 0 to 360
+        else if(quadrant === 2 && info.old.quadrant === 1){ //From 0 to 360
           delta = -360;
         }
       rotation = newDegree + delta - info.old.rotation + info.now.rotation;
@@ -130,7 +130,7 @@ function setConstants() {
     // AddEvent, cross-browser support (IE7+)
     addEvent: function (el, type, handler, capture) {
       type = type.split(' ');
-      for(var i=0; i < type.length; i++) {
+      for(let i=0; i < type.length; i++) {
         if (el.addEventListener) {
           el.addEventListener(type[i], handler, capture);
         }
@@ -143,7 +143,7 @@ function setConstants() {
     // RemoveEvent, cross-browser support (IE7+)
     removeEvent: function (el, type, handler) {
       type = type.split(' ');
-      for(var i=0; i < type.length; i++) {
+      for(let i=0; i < type.length; i++) {
         if (el.addEventListener) {
           el.removeEventListener(type[i], handler);
         }
@@ -155,7 +155,7 @@ function setConstants() {
 
     // triggerEvent, cross-browser support (IE7+)
     triggerEvent: function(el, type){
-      var evt;
+      let evt;
       if (JogDial.Doc.createEvent) { // W3C Standard
         evt = JogDial.Doc.createEvent("HTMLEvents");
         evt.initEvent(type, true, true);
@@ -179,15 +179,15 @@ function setConstants() {
   };
 
   JogDial.Ready = true;
-};
+}
 
-/*
-* Constructor
-* JogDial.Instance
-* @param  {HTMLElement}    element
-* @param  {Object}         options
-* return  {JogDial.Instance}
-*/
+/**
+ * Constructor
+ * JogDial.Instance
+ * @return  {boolean} or {JogDial.Instance}
+ * @param el Html element
+ * @param opt options
+ */
 JogDial.Instance = function (el ,opt) {
   // Prevent duplication
   if (el.getAttribute('_jogDial_')) {
@@ -226,18 +226,15 @@ JogDial.Instance.prototype = {
     return this;
   },
   trigger: function triggerEvent(type, data) {
-    switch (type){
-      case 'angle':
-        angleTo(this, JogDial.utils.convertClockToUnit(data), data);
-        break;
-      default:
-        window.alert('Please Check your code:\njogDial does not have triggering event [' + type + ']');
-        break;
+    if (type === 'angle') {
+      angleTo(this, JogDial.utils.convertClockToUnit(data), data);
+    } else {
+      window.alert('Please Check your code:\njogDial does not have triggering event [' + type + ']');
     }
     return this;
   },
   angle: function angle(data) {
-    var deg = (data > this.opt.maxDegree) ? this.opt.maxDegree : data;
+    const deg = (data > this.opt.maxDegree) ? this.opt.maxDegree : data;
     angleTo(this, JogDial.utils.convertClockToUnit(deg), deg);
   }
 };
@@ -259,16 +256,16 @@ function setStage(self) {
   * {HTMLElement}  JogDial.Instance.knob
   * {HTMLElement}  JogDial.Instance.wheel
   */
-  var item   = {},
-  BId      = self.base.getAttribute("id"),
-  BW       = self.base.clientWidth,
-  BH       = self.base.clientHeight,
-  opt     = self.opt,
-  K       = item.knob = document.createElement('div'),
-  W       = item.wheel = document.createElement('div'),
-  KS       = K.style,
-  WS       = W.style,
-  KRad, WRad, WMargnLT, WMargnTP;
+  let item = {},
+    BId = self.base.getAttribute("id"),
+    BW = self.base.clientWidth,
+    BH = self.base.clientHeight,
+    opt = self.opt,
+    K = item.knob = document.createElement('div'),
+    W = item.wheel = document.createElement('div'),
+    KS = K.style,
+    WS = W.style,
+    KRad, WRad, WMargnLT, WMargnTP;
 
   //Set position property as relative if it's not predefined in Stylesheet
   if (JogDial.utils.getComputedStyle(self.base, 'position') === 'static') {
@@ -313,8 +310,8 @@ function setStage(self) {
 }
 
 function setDebug(self) {
-  var KS = self.knob.style;
-  var WS = self.wheel.style;
+  const KS = self.knob.style;
+  const WS = self.wheel.style;
   KS.backgroundColor = '#00F';
   WS.backgroundColor = '#0F0';
   KS.opacity = WS.opacity = .4;
@@ -323,7 +320,7 @@ function setDebug(self) {
   //Fancy CSS3 for debug
   KS.webkitBorderRadius = WS.webkitBorderRadius = "50%";
   KS.borderRadius = WS.borderRadius = "50%";
-};
+}
 
 function setEvents(self) {
   /*
@@ -350,10 +347,10 @@ function setEvents(self) {
     });
   }
 
-  var opt = self.opt,
-  info = self.info,
-  K = self.knob,
-  W = self.wheel;
+  const opt = self.opt,
+    info = self.info,
+    K = self.knob,
+    W = self.wheel;
   self.pressed = false;
 
   // Add events
@@ -391,16 +388,16 @@ function setEvents(self) {
       (e.preventDefault) ? e.preventDefault() : e.returnValue = false;
 
       // var info = self.info, opt = self.opt,
-      var offset = JogDial.utils.getCoordinates(e),
-      _x = offset.x -self.center.x + W.offsetLeft,
-      _y = offset.y -self.center.y + W.offsetTop,
-      radian = Math.atan2(_y, _x) * JogDial.ToDeg,
-      quadrant = JogDial.utils.getQuadrant(_x, _y),
-      degree = JogDial.utils.convertUnitToClock(radian),
-      rotation;
+      let offset = JogDial.utils.getCoordinates(e),
+        _x = offset.x - self.center.x + W.offsetLeft,
+        _y = offset.y - self.center.y + W.offsetTop,
+        radian = Math.atan2(_y, _x) * JogDial.ToDeg,
+        quadrant = JogDial.utils.getQuadrant(_x, _y),
+        degree = JogDial.utils.convertUnitToClock(radian),
+        rotation;
 
       //Calculate the current rotation value based on pointer offset
-      info.now.rotation = JogDial.utils.getRotation(self, (quadrant == undefined) ? info.old.quadrant : quadrant  , degree);
+      info.now.rotation = JogDial.utils.getRotation(self, (quadrant === undefined) ? info.old.quadrant : quadrant  , degree);
       rotation = info.now.rotation;//Math.ceil(info.now.rotation);
 
       if(opt.maxDegree != null && opt.maxDegree <= rotation){
@@ -436,7 +433,7 @@ function setEvents(self) {
       // update angle
       angleTo(self, radian);
     }
-  };
+  }
 
   // mouseDragEvent (MOUSE_UP, MOUSE_OUT)
   function mouseUpEvent() {
@@ -461,14 +458,14 @@ function setEvents(self) {
 */
 function angleTo(self, radian, triggeredDegree) {
   radian *= JogDial.ToRad;
-  var _x =  Math.cos(radian) * self.radius + self.center.x,
-      _y =  Math.sin(radian) * self.radius + self.center.y,
-      quadrant = JogDial.utils.getQuadrant(_x, _y),
-      degree = JogDial.utils.convertUnitToClock(radian);
+  const _x = Math.cos(radian) * self.radius + self.center.x,
+    _y = Math.sin(radian) * self.radius + self.center.y,
+    quadrant = JogDial.utils.getQuadrant(_x, _y),
+    degree = JogDial.utils.convertUnitToClock(radian);
   self.knob.style.left = _x + 'px';
   self.knob.style.top = _y + 'px';
 
-  if(self.knob.rotation == undefined){
+  if(self.knob.rotation === undefined){
    // Update JogDial data information
     JogDial.utils.extend(self.knob, {
       rotation: self.opt.degreeStartAt,
