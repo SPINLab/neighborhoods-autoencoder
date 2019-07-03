@@ -54,7 +54,7 @@ const options = {
 };
 
 const ellipsesJogDialElement = document.getElementById('ellipses_jog_dial');
-const coefficientHeadingElement = document.getElementById('coefficient_heading');
+// const coefficientHeadingElement = document.getElementById('coefficient_heading');
 
 function updateEllipses(numberOfEllipses) {
   // coefficientHeadingElement.innerText = 'Ellipsis coefficients (working)';
