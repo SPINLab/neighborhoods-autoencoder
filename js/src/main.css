@@ -13,13 +13,13 @@
     display: none;
 }
 
-#jog_dial {
+#ellipses_jog_dial {
     position: relative;
     width: 260px;
     height: 260px;
     margin: 20px auto;
     background: url('img/base_one_bg.png') no-repeat;
 }
-#jog_dial #jog_dial_knob {
+#ellipses_jog_dial #ellipses_jog_dial_knob {
     background: url('img/base_one_knob.png') no-repeat;
 }
