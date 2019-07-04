@@ -59,7 +59,7 @@ export function initMap() {
   }));
 
   const defaultCenter = [2, 0];
-  const defaultZoom = 6;
+  const defaultZoom = 5;
   map.setView(defaultCenter, defaultZoom);
 
   return {map, drawnItems, reconstructionItems}

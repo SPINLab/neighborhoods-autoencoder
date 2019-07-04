@@ -6,7 +6,20 @@
 </head>
 <body>
 <h1 style="margin: 4px">Elliptical Fourier descriptor: the live demo</h1>
-<div id="map" style="width: 800px; height: 600px; border: 1px solid #ccc; margin: 4px"></div>
+<div>
+    <div id="map" style="width: 800px; height: 466px; border: 1px solid #ccc; margin: 4px; float: left"></div>
+    <div id="controls" style="float: left">
+        <div class="card">
+            <label for="locus" style="margin: 4px"><h4>Locus (offsets)</h4></label>
+            <input id="locus" type="text" value="Turn dial for locus and coefficients" style="margin: 4px">
+        </div>
+        <div class="card">
+            <label for="num_ellipses" style="margin: 4px"><h4>Number of ellipses</h4></label>
+            <input id="num_ellipses" type="text" value="1" style="width: 20%; margin: 4px">
+            <div id="ellipses_jog_dial"></div>
+        </div>
+    </div>
+</div>
 <div class="dial" style="width: 800px; margin: 4px">
     <div class="card" style="float: left; width: 520px">
         <h3 id="coefficient_heading">Ellipsis coefficients</h3>
@@ -20,17 +33,6 @@
                 </thead>
                 <tbody id="coefficients_table_body"></tbody>
             </table>
-        </div>
-    </div>
-    <div style="float: right">
-        <div class="card">
-            <label for="locus" style="margin: 4px"><h4>Locus (offsets)</h4></label>
-            <input id="locus" type="text" value="Turn dial for locus and coefficients" style="margin: 4px">
-        </div>
-        <div class="card">
-            <label for="num_ellipses" style="margin: 4px"><h4>Number of ellipses</h4></label>
-            <input id="num_ellipses" type="text" value="1" style="width: 20%; margin: 4px">
-            <div id="ellipses_jog_dial"></div>
         </div>
     </div>
 </div>

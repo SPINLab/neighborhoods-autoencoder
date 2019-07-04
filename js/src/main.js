@@ -91,6 +91,5 @@ numEllipsesInput.oninput = () => {
   ellipsesJogDial.angle(numberOfEllipses * 4);
 
   return updateEllipses(numberOfEllipses)
-    .then(() => console.log('Done'))
     .catch(console.error);
 };
