@@ -21,7 +21,8 @@ function extractPolygon(coords, numberOfEllipses) {
     const [offsets, coefficients] = resultsArray;
     locusBox.value = offsets.map(offset => offset.toPrecision(6));
     updateRows(tableBody, coefficients);
-    const numberOfPoints = coords.length;
+    // const numberOfPoints = coords.length;
+    const numberOfPoints = 300;
     return reconstructPolygon(coefficients, offsets, numberOfPoints);
   })
     // Switch x/y for lat/lon
