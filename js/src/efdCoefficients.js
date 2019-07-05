@@ -136,11 +136,8 @@ export function efdOffsets(polygon) {
   return offsets.array();
 }
 
-export function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=200) {
+export function reconstructEllipses(coefficients, locus=[0., 0.], numberOfPoints=200) {
   let coeffsTensor = tf.tensor(coefficients);
-  // coeffsTensor = coeffsTensor.reshape([coeffsTensor.shape[0], coeffsTensor.shape[1], 1]);
-  const locusTensor = tf.tensor(locus);
-
   const order = coeffsTensor.shape[0];
   const orders = tf.range(1, order + 1).reshape([-1, 1]);
 
@@ -154,21 +151,27 @@ export function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=
     .add(
       coeffsTensor.slice([0, 1], [coeffsTensor.shape[0], 1])
         .mul(tf.sin(orderPhases))
-    ).sum(0)
-    .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([0], [1])));
+    );
 
   const ytAll = coeffsTensor.slice([0, 2], [coeffsTensor.shape[0], 1])
     .mul(tf.cos(orderPhases))
     .add(
       coeffsTensor.slice([0, 3], [coeffsTensor.shape[0], 1])
         .mul(tf.sin(orderPhases))
-    ).sum(0)
-    .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([1], [1])));
+    );
+
+  return [xtAll, ytAll];
+}
+
+export function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=200) {
+  const locusTensor = tf.tensor(locus);
+  const [xtAll, ytAll] = reconstructEllipses(coefficients, locus, numberOfPoints);
 
   const reconstruction = tf.stack([
-    xtAll,
-    ytAll
+    xtAll.sum(0)
+      .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([0], [1]))),
+    ytAll.sum(0)
+      .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([1], [1])))
   ], 1);
-
   return reconstruction.array();
 }
