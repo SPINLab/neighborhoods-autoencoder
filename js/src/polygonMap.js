@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-mouse-position';
+import * as tf from '@tensorflow/tfjs';
 
 const samplePolygon = L.polygon([
   [-4.042968750000001, 2.1176816099851083],
@@ -38,6 +39,7 @@ export function initMap() {
   const map = L.map('map');
 
   const reconstructionItems = L.featureGroup().addTo(map);
+  const animationItems = L.featureGroup().addTo(map);
   const drawnItems = L.featureGroup().addTo(map);
   drawnItems.addLayer(samplePolygon);
 
@@ -62,16 +64,99 @@ export function initMap() {
   const defaultZoom = 5;
   map.setView(defaultCenter, defaultZoom);
 
-  return {map, drawnItems, reconstructionItems}
+  return {map, drawnItems, reconstructionItems, animationItems}
 }
 
 export function drawReconstruction(featureGroup, coordinates) {
   featureGroup.eachLayer((layer) => {
     layer.setStyle({
-      opacity: layer.options.opacity ? layer.options.opacity * 0.5 : 0.5,
-      fillOpacity: layer.options.fillOpacity ? layer.options.fillOpacity * 0.5 : 0.1
+      opacity: layer.options.opacity ? layer.options.opacity * 0.3 : 0.5,
+      fillOpacity: layer.options.fillOpacity ? layer.options.fillOpacity * 0.3 : 0.1
     })
   });
   const reconstructionPolygon = L.polygon(coordinates, {color: 'orange'});
   featureGroup.addLayer(reconstructionPolygon);
+}
+
+export function animateEllipses(featureGroup, ellipses, locus) {
+  featureGroup.clearLayers();
+
+  // Already add the centroid to the first polygon
+  const locusTensor = tf.tensor(locus);
+  const firstEllipse = tf.tensor([ellipses[0]])
+    .add(locusTensor);
+  // Re-assemble the offset first poly with the other polygons
+  const ellipsesTensor = tf.concat([
+    firstEllipse,
+    tf.tensor(ellipses.slice([1], [ellipses.length])) // auto-resolves to undefined if only one ellipse
+  ]);
+
+  ellipses = ellipsesTensor.arraySync();
+
+  // Draw the first polygon as is
+  // const ellipsePolygon = L.polygon(ellipses[0], {color: 'green'});
+  // featureGroup.addLayer(ellipsePolygon);
+  //
+  // Re-arrange to have list of points, each element of which contains the cooordinates for each ellipse
+  const pointSets = ellipsesTensor.transpose([1, 0, 2]).arraySync();
+  const timeout = 100;
+
+  // Iterate over the points
+  const pointSetIndex = 0;
+
+  function drawEllipses(pointSets, pointIndex, ellipses) {
+    return setTimeout(() => {
+      const pointSetTensor = tf.tensor(pointSets[pointIndex]);
+
+      ellipses.forEach((ellipse, index) => {
+        const ellipseTensor = tf.tensor(ellipse);
+        let offsetSum = tf.tensor([0, 0]);
+
+        let centroid;
+        if (index > 0) {
+          // Compute the offset sum of the previous ellipses
+          offsetSum = pointSetTensor.slice([0], [index])
+            .sum(0);
+          centroid = offsetSum.arraySync();
+        } else {
+          centroid = ellipseTensor.mean(0).arraySync();
+        }
+
+        ellipse = ellipseTensor.add(offsetSum).arraySync();
+        plotEllipse(featureGroup, ellipse);
+        plotLine(featureGroup, centroid, ellipse[pointIndex]);
+      });
+
+      if (pointIndex < pointSets.length - 1){
+        drawEllipses(pointSets, pointIndex + 1, ellipses)
+      }
+
+      return featureGroup.eachLayer((layer) => {
+        layer.setStyle({
+          opacity: layer.options.opacity ? layer.options.opacity * 0.5 : 0.5,
+          fillOpacity: layer.options.fillOpacity ? layer.options.fillOpacity * 0.5 : 0.2
+        });
+
+        if (layer.options.opacity < 0.1) {
+          featureGroup.removeLayer(layer);
+        }
+      });
+    }, timeout);
+  }
+
+  drawEllipses(pointSets, pointSetIndex, ellipses);
+}
+
+function plotEllipse(featureGroup, ellipse) {
+  const ellipsePoly = L.polygon(ellipse, {color: 'green'});
+  featureGroup.addLayer(ellipsePoly);
+}
+
+function plotLine(featureGroup, centroid, target) {
+  /**
+   * Plots a yellow line on a feature group from a centroid to a target coordinate
+   */
+
+  const line = L.polyline([centroid, target], {color: 'yellow'});
+  return featureGroup.addLayer(line);
 }

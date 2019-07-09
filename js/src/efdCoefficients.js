@@ -136,7 +136,7 @@ export function efdOffsets(polygon) {
   return offsets.array();
 }
 
-export function reconstructEllipses(coefficients, locus=[0., 0.], numberOfPoints=200) {
+export function reconstructEllipses(coefficients, numberOfPoints=200) {
   let coeffsTensor = tf.tensor(coefficients);
   const order = coeffsTensor.shape[0];
   const orders = tf.range(1, order + 1).reshape([-1, 1]);
@@ -160,18 +160,14 @@ export function reconstructEllipses(coefficients, locus=[0., 0.], numberOfPoints
         .mul(tf.sin(orderPhases))
     );
 
-  return [xtAll, ytAll];
+  return tf.stack([xtAll, ytAll], 2);
 }
 
 export function reconstructPolygon(coefficients, locus=[0., 0.], numberOfPoints=200) {
   const locusTensor = tf.tensor(locus);
-  const [xtAll, ytAll] = reconstructEllipses(coefficients, locus, numberOfPoints);
+  const ellipses = reconstructEllipses(coefficients, numberOfPoints);
 
-  const reconstruction = tf.stack([
-    xtAll.sum(0)
-      .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([0], [1]))),
-    ytAll.sum(0)
-      .add(tf.ones([numberOfPoints]).mul(locusTensor.slice([1], [1])))
-  ], 1);
+  const reconstruction = ellipses.sum(0)
+      .add(locusTensor);
   return reconstruction.array();
 }

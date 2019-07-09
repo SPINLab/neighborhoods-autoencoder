@@ -1,12 +1,12 @@
-import {initMap, drawReconstruction} from './polygonMap';
+import {initMap, drawReconstruction, animateEllipses} from './polygonMap';
 import JogDial from './jogDial';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import L from "leaflet";
-import {efd, efdOffsets, reconstructPolygon} from "./efdCoefficients";
+import {efd, efdOffsets, reconstructPolygon, reconstructEllipses} from "./efdCoefficients";
 import updateRows from "./tableRowsFromCoefficients";
 
-const {map, drawnItems, reconstructionItems} = initMap();
+const {map, drawnItems, reconstructionItems, animationItems} = initMap();
 const numEllipsesInput = document.getElementById('num_ellipses');
 const tableBody = document.getElementById('coefficients_table_body');
 const locusBox = document.getElementById('locus');
@@ -14,39 +14,46 @@ const locusBox = document.getElementById('locus');
 let didUserChangeEllipsesInputManually = false;
 
 function extractPolygon(coords, numberOfEllipses) {
+  let offsets, coefficients;
+  const numberOfPoints = 200;
+
   return Promise.all([
     efdOffsets(coords),
     efd(coords, numberOfEllipses)
   ]).then((resultsArray) => {
-    const [offsets, coefficients] = resultsArray;
+    [offsets, coefficients] = resultsArray;
     locusBox.value = offsets.map(offset => offset.toPrecision(6));
     updateRows(tableBody, coefficients);
     // const numberOfPoints = coords.length;
-    const numberOfPoints = 300;
     return reconstructPolygon(coefficients, offsets, numberOfPoints);
   })
-    // Switch x/y for lat/lon
-    .then((reconstruction) => reconstruction.map(point => [point[1], point[0]]))
-    .then((reconstruction) => drawReconstruction(reconstructionItems, reconstruction));
+    .then((reconstruction) => drawReconstruction(reconstructionItems, reconstruction))
+    // Get the individual ellipses
+    .then(() => reconstructEllipses(coefficients, numberOfPoints))
+    .then((ellipses) => ellipses.array())
+    .then((ellipses) => {
+      console.log(ellipses);
+      animateEllipses(animationItems, ellipses, offsets)
+    })
+  // ;
 }
 
 map.on(L.Draw.Event.CREATED, (event) => {
   drawnItems.eachLayer((layer) => drawnItems.removeLayer(layer));
   const layer = event.layer;
   drawnItems.addLayer(layer);
-  const drawnPoints = event.layer.editing.latlngs[0][0];
-  console.log(drawnPoints);
 
-  // Reverse axis order to match x-longitude/y-latitude!
-  const coords = drawnPoints.map(latLng => [latLng.lng, latLng.lat]);
+  const drawnPoints = event.layer.editing.latlngs[0][0]
+    .map(latLng => [latLng.lat, latLng.lng]);
+
   const numberOfEllipses = Number(numEllipsesInput.value);
 
-  return extractPolygon(coords, numberOfEllipses, drawnPoints)
+  return extractPolygon(drawnPoints, numberOfEllipses, drawnPoints)
     .then(() => console.log('Done'))
     .catch(console.error)
 });
 
-// Construct and register ellises jog dial
+// Construct and register ellipses jog dial
 const options = {
   debug: false,
   wheelSize: "80%",
@@ -63,11 +70,12 @@ function updateEllipses(numberOfEllipses) {
 
   let layers = [];
   drawnItems.eachLayer((layer) => layers.push(layer));
-  const drawnPoints = layers[0].editing.latlngs[0][0];
-  const coords = drawnPoints.map(latLng => [latLng.lng, latLng.lat]);
-  coords.push(coords[0]); // Append closing point
+  const drawnPoints = layers[0].editing.latlngs[0][0]
+    .map(latLng => [latLng.lat, latLng.lng]);
 
-  return extractPolygon(coords, numberOfEllipses)
+  drawnPoints.push(drawnPoints[0]); // Append start->closing point to create fully closed polygon contour
+
+  return extractPolygon(drawnPoints, numberOfEllipses)
 }
 
 const ellipsesJogDial = JogDial(ellipsesJogDialElement, options)
