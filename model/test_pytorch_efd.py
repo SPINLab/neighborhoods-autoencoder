@@ -109,4 +109,23 @@ class TestEllipticFourierDescriptor(unittest.TestCase):
 
             np.testing.assert_array_almost_equal(pyefd_centroid, pytorch_centroid[0])
 
+        with self.subTest('It correctly calculates centroids for batches'):
+            geom2 = 'POLYGON((1 1, 0 1, 0 0, 1 0, 1 1))'
+            geom2 = gv.vectorize_wkt(geom2)
+
+            coords_batch = geom2[:, :2]
+            coords_batch = coords_batch.reshape(1, geom2.shape[0], 2)
+            polygon2_tensor = torch.from_numpy(coords_batch)
+            batch_size = 6
+            batch = polygon2_tensor.repeat(batch_size, 1, 1)
+            multiply_range = torch.range(1., 6., dtype=batch.dtype).reshape(batch_size, 1, 1)
+            batch = batch * multiply_range
+
+            reference_centroids = np.arange(1, batch_size + 1)
+            reference_centroids = reference_centroids.reshape(batch_size, 1) * 0.5
+            reference_centroids = reference_centroids.repeat(2, axis=1)
+
+            batch_centroids = centroid(batch)
+
+            np.testing.assert_array_almost_equal(reference_centroids, batch_centroids)
 

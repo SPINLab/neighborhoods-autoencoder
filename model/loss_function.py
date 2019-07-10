@@ -2,8 +2,8 @@ import torch
 
 
 def loss_function(reconstruction_target: torch.Tensor, model_output: torch.Tensor) -> torch.Tensor:
-    assert type(reconstruction_target).__name__ == 'Tensor', 'The reconstruction target should be a tensor'
-    assert type(model_output).__name__ == 'Tensor', 'The model output should be a tensor'
+    assert isinstance(reconstruction_target, torch.Tensor), 'The reconstruction target should be a tensor'
+    assert isinstance(model_output, torch.Tensor), 'The model output should be a tensor'
     assert reconstruction_target.size(0) > 0, 'The reconstruction target should be a tensor with length > 0'
     assert model_output.size(0) > 0, 'The model output should be a tensor with length > 0'
     assert reconstruction_target.size(1) == 7, 'The reconstruction target should be a tensor of shape(?, 7)'
