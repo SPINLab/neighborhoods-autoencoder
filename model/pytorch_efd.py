@@ -11,14 +11,10 @@ def efd(polygon_batch: torch.Tensor, order=10) -> torch.Tensor:
     :return: a torch tensor of shape (batch_size, order, 4)
     """
     assert isinstance(polygon_batch, torch.Tensor), 'The polygon_batch should be a tensor'
-    assert len(polygon_batch.size()) == 3, 'The polygon_batch should be a 3D tensor'
+    assert len(polygon_batch.shape) == 3, 'The polygon_batch should be a 3D tensor'
     assert polygon_batch.size(-1) == 2, 'The polygon_batch should be of shape (?, 2): two coordinate axes'
 
     batch_size = polygon_batch.size(0)
-
-    # Add zero-padding in case the polygon_batch doesn't have this
-    zeros = torch.zeros((batch_size, 1, 2), dtype=polygon_batch.dtype)
-    polygon_batch = torch.cat((polygon_batch, zeros), dim=1)
 
     epsilon = torch.tensor(1e-16)
     # Following https://discuss.pytorch.org/t/equivalent-function-like-numpy-diff-in-pytorch/35327/2
@@ -30,28 +26,18 @@ def efd(polygon_batch: torch.Tensor, order=10) -> torch.Tensor:
 
     # Get rid of the epsilons added to zeros
     lengths = lengths - torch.sqrt(epsilon)
-
     cumulative_lengths = torch.cumsum(lengths, dim=1)  # pyefd: t
 
-    # Replace the false maximum introduced by the zero padding with a true max
-    false_max = torch.max(cumulative_lengths, dim=1)
-    false_max = false_max[0].unsqueeze(0).t()
-    rescale_factor = cumulative_lengths / (cumulative_lengths - false_max + epsilon)
-    cumulative_lengths = cumulative_lengths - false_max
-    cumulative_lengths = cumulative_lengths * rescale_factor
-
-    # Replace the zeros with true max
-    true_max = torch.max(cumulative_lengths, dim=1)
-    true_max = true_max[0].unsqueeze(0).t()  # pyefd: T
-    rescale_factor = (cumulative_lengths - true_max) / (cumulative_lengths + epsilon)
-    cumulative_lengths = cumulative_lengths * rescale_factor
-    cumulative_lengths = cumulative_lengths + true_max
+    true_max, _ = torch.max(cumulative_lengths, dim=1)
+    true_max = true_max.unsqueeze(0).t()  # pyefd: T
 
     zeros = torch.zeros((batch_size, 1), dtype=polygon_batch.dtype)
     cumulative_lengths = torch.cat((zeros, cumulative_lengths), dim=1)  # pyefd: t
+
     normalized_distances = (2 * math.pi * cumulative_lengths) / true_max  # pyefd: phi
 
-    efd_orders = torch.arange(1, order + 1, dtype=polygon_batch.dtype).unsqueeze(0).t()  # shape: (batch_size, num_points)
+    efd_orders = torch.arange(1, order + 1, dtype=polygon_batch.dtype)
+    efd_orders = efd_orders.unsqueeze(0).t()  # shape: (batch_size, num_points)
     efd_orders = efd_orders.repeat((batch_size, 1, 1))  # pyefd: n in orders. Shape: (batch_size, order)
 
     # pyefd: phi_n. Shape: (batch_size, order, num_points)
@@ -76,3 +62,38 @@ def efd(polygon_batch: torch.Tensor, order=10) -> torch.Tensor:
                                     coefficient_d), dim=2)
 
     return efd_coefficients
+
+
+def centroid(polygon_batch: torch.Tensor) -> torch.Tensor:
+    assert isinstance(polygon_batch, torch.Tensor), 'The polygon_batch should be a tensor'
+    assert len(polygon_batch.size()) == 3, 'The polygon_batch should be a 3D tensor'
+
+    batch_size = polygon_batch.size(0)
+    epsilon = torch.tensor(1e-16)
+    # Following https://discuss.pytorch.org/t/equivalent-function-like-numpy-diff-in-pytorch/35327/2
+    point_distances = polygon_batch[:, 1:] - polygon_batch[:, :-1]  # pyefd: dxy
+
+    lengths = torch.pow(point_distances, 2)  # pyefd: dt
+    lengths = torch.sum(lengths, dim=2)  # pyefd: dt
+    lengths = torch.sqrt(lengths + epsilon)  # pyefd: dt
+
+    # Get rid of the epsilons added to zeros
+    lengths = lengths - torch.sqrt(epsilon)
+    cumulative_lengths = torch.cumsum(lengths, dim=1)  # pyefd: t
+
+    true_max, _ = torch.max(cumulative_lengths, dim=1)
+    true_max = true_max.unsqueeze(0).t()  # pyefd: T
+
+    zeros = torch.zeros((batch_size, 1), dtype=polygon_batch.dtype)
+    cumulative_lengths = torch.cat((zeros, cumulative_lengths), dim=1)  # pyefd: t
+
+    squared_cum_lengths = torch.pow(cumulative_lengths, 2)
+    diff_squared_cum_lengths = squared_cum_lengths[:, 1:] - squared_cum_lengths[:, :-1]
+
+    xi_delta = torch.cumsum(point_distances, dim=1) - \
+           (point_distances / lengths.unsqueeze(-1)) * cumulative_lengths[:, 1:].unsqueeze(-1)  # pyefd: xi
+    offsets = (1 / true_max) * torch.sum(
+        (point_distances / (2 * lengths.unsqueeze(-1))) *
+        diff_squared_cum_lengths.unsqueeze(-1) + xi_delta * lengths.unsqueeze(-1), dim=1)
+
+    return offsets + polygon_batch[:, 0]
