@@ -23,11 +23,12 @@ def numpy_vectorized_efd(contour, order=10, normalize=False):
     phi = (2 * np.pi * t) / T
 
     orders = np.arange(1, order + 1)
-    consts = T / (2 * orders * orders * np.pi * np.pi)
     phi = phi * orders.reshape((order, -1))
     d_cos_phi = np.cos(phi[:, 1:]) - np.cos(phi[:, :-1])
     d_sin_phi = np.sin(phi[:, 1:]) - np.sin(phi[:, :-1])
     cos_phi = (dxy[:, 0] / dt) * d_cos_phi
+
+    consts = T / (2 * orders * orders * np.pi * np.pi)
     a = consts * np.sum(cos_phi, axis=1)
     b = consts * np.sum((dxy[:, 0] / dt) * d_sin_phi, axis=1)
     c = consts * np.sum((dxy[:, 1] / dt) * d_cos_phi, axis=1)
