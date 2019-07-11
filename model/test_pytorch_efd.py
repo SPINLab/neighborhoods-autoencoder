@@ -9,6 +9,7 @@ from model.numpy_vectorized_efd import numpy_vectorized_efd
 from model.pytorch_efd import efd, centroid
 
 
+# noinspection PyUnresolvedReferences
 class TestEllipticFourierDescriptor(unittest.TestCase):
     def test_efd(self):
         geom1 = 'POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))'
@@ -118,7 +119,7 @@ class TestEllipticFourierDescriptor(unittest.TestCase):
             polygon2_tensor = torch.from_numpy(coords_batch)
             batch_size = 6
             batch = polygon2_tensor.repeat(batch_size, 1, 1)
-            multiply_range = torch.range(1., 6., dtype=batch.dtype).reshape(batch_size, 1, 1)
+            multiply_range = torch.range(1., 6., dtype=batch.dtype).reshape((batch_size, 1, 1))
             batch = batch * multiply_range
 
             reference_centroids = np.arange(1, batch_size + 1)
@@ -127,5 +128,4 @@ class TestEllipticFourierDescriptor(unittest.TestCase):
 
             batch_centroids = centroid(batch)
 
-            np.testing.assert_array_almost_equal(reference_centroids, batch_centroids)
-
+            np.testing.assert_array_almost_equal(reference_centroids, batch_centroids.numpy())
