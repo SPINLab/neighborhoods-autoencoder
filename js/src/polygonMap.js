@@ -108,14 +108,14 @@ export function animateEllipses(featureGroup, ellipses, locus) {
     return setTimeout(() => {
       const pointSetTensor = tf.tensor(pointSets[pointIndex]);
 
-      ellipses.forEach((ellipse, index) => {
+      ellipses.forEach((ellipse, ellipseIndex) => {
         const ellipseTensor = tf.tensor(ellipse);
         let offsetSum = tf.tensor([0, 0]);
 
         let centroid;
-        if (index > 0) {
+        if (ellipseIndex > 0) {
           // Compute the offset sum of the previous ellipses
-          offsetSum = pointSetTensor.slice([0], [index])
+          offsetSum = pointSetTensor.slice([0], [ellipseIndex])
             .sum(0);
           centroid = offsetSum.arraySync();
         } else {
@@ -125,6 +125,12 @@ export function animateEllipses(featureGroup, ellipses, locus) {
         ellipse = ellipseTensor.add(offsetSum).arraySync();
         plotEllipse(featureGroup, ellipse);
         plotLine(featureGroup, centroid, ellipse[pointIndex]);
+
+        let isLastEllipse = ellipseIndex === ellipses.length - 1;
+        if (isLastEllipse) {
+          let endpoint = pointSetTensor.sum(0).arraySync();
+          featureGroup._map.panTo(endpoint)
+        }
       });
 
       if (pointIndex < pointSets.length - 1){
