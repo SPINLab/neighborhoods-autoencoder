@@ -7,15 +7,22 @@
 <body>
 <h1 style="margin: 4px">Elliptical Fourier descriptor: the live demo</h1>
 <div>
-    <div id="map" style="width: 800px; height: 488px; border: 1px solid #ccc; margin: 4px; float: left"></div>
+    <div id="map" style="width: 800px; height: 530px; border: 1px solid #ccc; margin: 4px; float: left"></div>
     <div id="controls" style="float: left">
         <div class="card">
-            <label for="locus" style="margin: 4px"><h4>Locus (offsets)</h4></label>
+            <label for="locus" style="margin: 4px"><h6>Locus (offsets)</h6></label>
             <input id="locus" type="text" value="Turn dial for locus and coefficients" style="margin: 4px">
         </div>
-        <div class="card">
-            <label for="num_ellipses" style="margin: 4px"><h4>Number of ellipses</h4></label>
-            <input id="num_ellipses" type="text" value="1" style="width: 20%; margin: 4px">
+        <div class="card" style="width: 100%">
+            <div>
+                <label for="num_ellipses" style="margin: 4px"><h6>Number of ellipses</h6></label><br>
+                <input id="num_ellipses" type="text" value="1" style="width: 20%; margin: 4px">
+            </div>
+            <div class="card">
+                <label style="margin: 4px"><h6>Track reconstuction on map</h6>
+                    <input type="checkbox" id="follow_reconstruction" checked>
+                </label>
+            </div>
             <div id="ellipses_jog_dial"></div>
             <a href="https://github.com/SPINLab/neighborhoods-autoencoder/tree/master/js/src" style="float: right">[source code]</a>
         </div>

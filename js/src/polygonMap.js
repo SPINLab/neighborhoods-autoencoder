@@ -128,8 +128,12 @@ export function animateEllipses(featureGroup, ellipses, locus) {
 
         let isLastEllipse = ellipseIndex === ellipses.length - 1;
         if (isLastEllipse) {
-          let endpoint = pointSetTensor.sum(0).arraySync();
-          featureGroup._map.panTo(endpoint)
+          const followReconstruction = document.getElementById('follow_reconstruction').checked;
+
+          if (followReconstruction) {
+            const endpoint = pointSetTensor.sum(0).arraySync();
+            featureGroup._map.panTo(endpoint);
+          }
         }
       });
 
