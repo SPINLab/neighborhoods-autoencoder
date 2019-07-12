@@ -12,7 +12,7 @@ def efd(polygon_batch: torch.Tensor, order=10) -> torch.Tensor:
     """
     assert isinstance(polygon_batch, torch.Tensor), 'The polygon_batch should be a tensor'
     assert len(polygon_batch.shape) == 3, 'The polygon_batch should be a 3D tensor'
-    assert polygon_batch.size(-1) == 2, 'The polygon_batch should be of shape (?, 2): two coordinate axes'
+    assert polygon_batch.size(-1) == 2, 'The polygon_batch should be of shape (?, ?, 2): two coordinate axes'
 
     batch_size = polygon_batch.size(0)
 
