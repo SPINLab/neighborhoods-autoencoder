@@ -7,7 +7,23 @@
 <body>
 <h1 style="margin: 4px">Elliptical Fourier descriptor: the live demo</h1>
 <div>
-    <div id="map" style="width: 800px; height: 530px; border: 1px solid #ccc; margin: 4px; float: left"></div>
+    <div style="float: left; width: 600px;">
+        <div id="map" style="width: 100%; height: 330px; border: 1px solid #ccc; margin: 4px;"></div>
+        <div class="card" style="float: left; width: 100%">
+            <h3 id="coefficient_heading">Ellipsis coefficients</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <th>a</th>
+                    <th>b</th>
+                    <th>c</th>
+                    <th>d</th>
+                    </thead>
+                    <tbody id="coefficients_table_body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <div id="controls" style="float: left">
         <div class="card">
             <label for="locus" style="margin: 4px"><h6>Locus (offsets)</h6></label>
@@ -25,22 +41,6 @@
             </div>
             <div id="ellipses_jog_dial"></div>
             <a href="https://github.com/SPINLab/neighborhoods-autoencoder/tree/master/js/src" style="float: right">[source code]</a>
-        </div>
-    </div>
-</div>
-<div class="dial" style="width: 800px; margin: 4px">
-    <div class="card" style="float: left; width: 520px">
-        <h3 id="coefficient_heading">Ellipsis coefficients</h3>
-        <div class="table-responsive">
-            <table class="table table-striped table-sm">
-                <thead>
-                    <th>a</th>
-                    <th>b</th>
-                    <th>c</th>
-                    <th>d</th>
-                </thead>
-                <tbody id="coefficients_table_body"></tbody>
-            </table>
         </div>
     </div>
 </div>
