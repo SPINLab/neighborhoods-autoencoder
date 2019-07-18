@@ -12,7 +12,7 @@
         <div class="card" style="float: left; width: auto; margin: 4px;">
             <h3 id="coefficient_heading">Ellipsis coefficients</h3>
             <div class="table-responsive">
-                <table class="table table-striped table-sm">
+                <table class="table table-striped table-sm" id="coefficients_table">
                     <thead>
                     <th>a</th>
                     <th>b</th>
@@ -34,6 +34,11 @@
                 <label for="num_ellipses" style="margin: 4px"><h6>Number of ellipses </h6></label><br>
                 <input id="num_ellipses" type="text" value="1" style="width: 20%; margin: 4px">
                 (Type or turn dial)
+            </div>
+            <div class="card">
+                <label style="margin: 4px"><h6>Animate reconstuction</h6>
+                    <input type="checkbox" id="animate_reconstruction" checked>
+                </label>
             </div>
             <div class="card">
                 <label style="margin: 4px"><h6>Track reconstuction on map</h6>

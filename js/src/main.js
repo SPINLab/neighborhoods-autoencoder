@@ -1,42 +1,17 @@
-import {initMap, drawReconstruction, animateEllipses} from './polygonMap';
+import {initMap} from './polygonMap';
 import JogDial from './jogDial';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import L from "leaflet";
-import {efd, efdOffsets, reconstructPolygon, reconstructEllipses} from "./efdCoefficients";
-import updateRows from "./tableRowsFromCoefficients";
+import extractPolygon from "./extractPolygon";
 
 const {map, drawnItems, reconstructionItems, animationItems} = initMap();
+// expose to global window state
+window.animationItems = animationItems;
+window.reconstructionItems = reconstructionItems;
 const numEllipsesInput = document.getElementById('num_ellipses');
-const tableBody = document.getElementById('coefficients_table_body');
-const locusBox = document.getElementById('locus');
 
 let didUserChangeEllipsesInputManually = false;
-
-function extractPolygon(coords, numberOfEllipses) {
-  let offsets, coefficients;
-  const numberOfPoints = 200;
-
-  return Promise.all([
-    efdOffsets(coords),
-    efd(coords, numberOfEllipses)
-  ]).then((resultsArray) => {
-    [offsets, coefficients] = resultsArray;
-    locusBox.value = offsets.map(offset => offset.toPrecision(6));
-    updateRows(tableBody, coefficients);
-    // const numberOfPoints = coords.length;
-    return reconstructPolygon(coefficients, offsets, numberOfPoints);
-  })
-    .then((reconstruction) => drawReconstruction(reconstructionItems, reconstruction))
-    // Get the individual ellipses
-    .then(() => reconstructEllipses(coefficients, numberOfPoints))
-    .then((ellipses) => ellipses.array())
-    .then((ellipses) => {
-      console.log(ellipses);
-      animateEllipses(animationItems, ellipses, offsets)
-    })
-  // ;
-}
 
 map.on(L.Draw.Event.CREATED, (event) => {
   drawnItems.eachLayer((layer) => drawnItems.removeLayer(layer));
@@ -48,7 +23,7 @@ map.on(L.Draw.Event.CREATED, (event) => {
 
   const numberOfEllipses = Number(numEllipsesInput.value);
 
-  return extractPolygon(drawnPoints, numberOfEllipses, drawnPoints)
+  return extractPolygon(drawnPoints, numberOfEllipses, reconstructionItems, animationItems)
     .then(() => console.log('Done'))
     .catch(console.error)
 });
@@ -74,8 +49,7 @@ function updateEllipses(numberOfEllipses) {
     .map(latLng => [latLng.lat, latLng.lng]);
 
   drawnPoints.push(drawnPoints[0]); // Append start->closing point to create fully closed polygon contour
-
-  return extractPolygon(drawnPoints, numberOfEllipses)
+  return extractPolygon(drawnPoints, numberOfEllipses, reconstructionItems, animationItems)
 }
 
 const ellipsesJogDial = JogDial(ellipsesJogDialElement, options)
