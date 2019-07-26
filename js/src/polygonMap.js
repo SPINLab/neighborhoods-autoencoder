@@ -67,7 +67,9 @@ export function initMap() {
   return {map, drawnItems, reconstructionItems, animationItems}
 }
 
-export function drawReconstruction(featureGroup, coordinates) {
+export function drawReconstruction(coordinates) {
+  const featureGroup = window.reconstructionItems;
+
   featureGroup.eachLayer((layer) => {
     layer.setStyle({
       opacity: layer.options.opacity ? layer.options.opacity * 0.3 : 0.5,
@@ -105,6 +107,9 @@ export function animateEllipses(featureGroup, ellipses, locus) {
   const pointSetIndex = 0;
 
   function drawEllipses(pointSets, pointIndex, ellipses) {
+    const doDraw = document.getElementById('animate_reconstruction').checked;
+    if (!doDraw) { return; }  // Break recursion loop if the user has disabled the animation
+
     return setTimeout(() => {
       const pointSetTensor = tf.tensor(pointSets[pointIndex]);
 

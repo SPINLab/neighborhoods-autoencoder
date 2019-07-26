@@ -5,18 +5,40 @@
     <title>Shape analysis demo through elliptical fourier descriptors</title>
 </head>
 <body>
-<h1 style="margin: 4px">Elliptical Fourier descriptor: the live demo</h1>
+<h1 style="margin: 4px">Elliptical Fourier analysis</h1>
 <div>
-    <div id="map" style="width: 800px; height: 530px; border: 1px solid #ccc; margin: 4px; float: left"></div>
-    <div id="controls" style="float: left">
+    <div style="float: left; width: 480px;">
+        <div id="map" style="width: auto; height: 330px; border: 1px solid #ccc; margin: 4px;"></div>
+        <div class="card" style="float: left; width: auto; margin: 4px;">
+            <h3 id="coefficient_heading">Ellipsis coefficients</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm" id="coefficients_table">
+                    <thead>
+                    <th>a</th>
+                    <th>b</th>
+                    <th>c</th>
+                    <th>d</th>
+                    </thead>
+                    <tbody id="coefficients_table_body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="controls" style="float: left; width: 268px">
         <div class="card">
-            <label for="locus" style="margin: 4px"><h6>Locus (offsets)</h6></label>
-            <input id="locus" type="text" value="Turn dial for locus and coefficients" style="margin: 4px">
+            <label for="locus" style="margin: 4px"><h6>Centroid</h6></label>
+            <input id="locus" type="text" value="Turn dial for centroid and coefficients" style="margin: 4px">
         </div>
         <div class="card" style="width: 100%">
             <div>
-                <label for="num_ellipses" style="margin: 4px"><h6>Number of ellipses</h6></label><br>
+                <label for="num_ellipses" style="margin: 4px"><h6>Number of ellipses </h6></label><br>
                 <input id="num_ellipses" type="text" value="1" style="width: 20%; margin: 4px">
+                (Type or turn dial)
+            </div>
+            <div class="card">
+                <label style="margin: 4px"><h6>Animate reconstuction</h6>
+                    <input type="checkbox" id="animate_reconstruction" checked>
+                </label>
             </div>
             <div class="card">
                 <label style="margin: 4px"><h6>Track reconstuction on map</h6>
@@ -25,22 +47,6 @@
             </div>
             <div id="ellipses_jog_dial"></div>
             <a href="https://github.com/SPINLab/neighborhoods-autoencoder/tree/master/js/src" style="float: right">[source code]</a>
-        </div>
-    </div>
-</div>
-<div class="dial" style="width: 800px; margin: 4px">
-    <div class="card" style="float: left; width: 520px">
-        <h3 id="coefficient_heading">Ellipsis coefficients</h3>
-        <div class="table-responsive">
-            <table class="table table-striped table-sm">
-                <thead>
-                    <th>a</th>
-                    <th>b</th>
-                    <th>c</th>
-                    <th>d</th>
-                </thead>
-                <tbody id="coefficients_table_body"></tbody>
-            </table>
         </div>
     </div>
 </div>
